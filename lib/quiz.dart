@@ -1,4 +1,6 @@
+import 'package:appwrite/appwrite.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_appwrite_quizeee/constants.dart';
 import 'question.dart';
 
 class QuizPage extends StatefulWidget {
@@ -25,7 +27,26 @@ class _QuizPageState extends State<QuizPage> {
     _loadQuestions();
   }
 
-  _loadQuestions() async {}
+  _loadQuestions() async {
+    setState(() {
+      loading = true;
+    });
+
+    Client client = Client();
+    client.setEndpoint(AppConstants.endPoint).setProject(AppConstants.project);
+
+    Databases db = Databases(client, databaseId: AppConstants.database);
+
+    final documents =
+        await db.listDocuments(collectionId: AppConstants.collection);
+
+    questions = documents
+        .convertTo((data) => Question.fromMap(Map<String, dynamic>.from(data)));
+
+    setState(() {
+      loading = false;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
